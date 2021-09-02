@@ -10,9 +10,14 @@ use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-    	$books = DB::table('book')->get();
+        $books = Book::get();
     	return [
             'status' => '200 OK',
             'message' => 'data terload',
@@ -21,6 +26,14 @@ class BookController extends Controller
         // $books = Book::paginate(20);
         // return BookResource::collection($books);
     }
+
+ 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     // title, description. author. publisher. date_of_issue
     {
@@ -37,8 +50,15 @@ class BookController extends Controller
             'data' => $bookStore,
         ];  
     }
-    
-    public function bookId($id){
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
         $book = Book::find($id);
         if($book == null){
             return [
@@ -53,7 +73,43 @@ class BookController extends Controller
         ];   
         }
     }
-    public function update(Request $request, $id, Book $book){
+    public function search($title)
+    {
+        $book = Book::where('title','LIKE',"%$title%")->get();
+        if(count($book) > 0){
+            return [
+                'status' => '200 OK',
+                'message' => 'Data successful loaded',
+                'data' => $book,
+            ];      
+        } else {
+            return [
+                'status' => '404',
+                'message' => "Tidak ada data dengan title $title",    
+            ];
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
         $book = Book::find($id);
         if($book == null){
             return [
@@ -77,10 +133,16 @@ class BookController extends Controller
         // if($books->save()){
         //     return new BookResource($books);
         // }
-        
     }
 
-    public function delete($id){
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function delete($id)
+    {
         $book = Book::find($id);
         if($book == null){
             return [
