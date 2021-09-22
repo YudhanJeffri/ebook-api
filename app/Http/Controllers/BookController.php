@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BookResource;
+use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
@@ -17,17 +18,17 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::get();
-    	return [
-            'status' => '200 OK',
+        $data = Book::get();
+        return response([
+            'status' => 200,
             'message' => 'data terload',
-            'data' => $books,
-        ];
+            'data' => $data,
+        ],200);
         // $books = Book::paginate(20);
         // return BookResource::collection($books);
     }
 
- 
+
     /**
      * Store a newly created resource in storage.
      *
@@ -37,18 +38,18 @@ class BookController extends Controller
     public function store(Request $request)
     // title, description. author. publisher. date_of_issue
     {
-        $bookStore = new Book;
-        $bookStore->title = $request->title;
-        $bookStore->description = $request->description;
-        $bookStore->author = $request->author;
-        $bookStore->publisher = $request->publisher;
-        $bookStore->date_of_issue = $request->date_of_issue;
-        $bookStore->save();
-        return [
-            'status' => '200 OK',
-            'message' => 'Data berhasil ditambah',
-            'data' => $bookStore,
-        ];  
+        $data = Book::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'author' => $request->author,
+            'publisher' => $request->publisher,
+            'date_of_issue' => $request->date_of_issue
+        ]);
+        return response([
+            'status' => 200,
+            'message' => 'Data successfully added',
+            'data' => $data,
+        ],200);
     }
 
     /**
@@ -59,34 +60,34 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $book = Book::find($id);
-        if($book == null){
-            return [
-                'status' => '200 OK',
-                'message' => "Tidak ada data dengan id $id",    
-            ];   
+        $data = Book::find($id);
+        if ($data == null) {
+            return response([
+                'status' => 404,
+                'message' => "Tidak ada data dengan id $id",
+            ],404);
         } else {
-        return [
-            'status' => '200 OK',
-            'message' => 'Data terload',
-            'data' => $book,
-        ];   
+            return response([
+                'status' => 200,
+                'message' => 'Data terload',
+                'data' => $data,
+            ],200);
         }
     }
     public function search($title)
     {
-        $book = Book::where('title','LIKE',"%$title%")->get();
-        if(count($book) > 0){
-            return [
-                'status' => '200 OK',
+        $data = Book::where('title', 'LIKE', "%$title%")->get();
+        if (count($data) > 0) {
+            return response([
+                'status' => 200,
                 'message' => 'Data successful loaded',
-                'data' => $book,
-            ];      
+                'data' => $data,
+            ],200);
         } else {
-            return [
-                'status' => '404',
-                'message' => "Tidak ada data dengan title $title",    
-            ];
+            return response([
+                'status' => 404,
+                'message' => "Tidak ada data dengan title $title",
+            ],404);
         }
     }
 
@@ -110,29 +111,23 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $book = Book::find($id);
-        if($book == null){
-            return [
-                'status' => '200 OK',
-                'message' => "Tidak ada data dengan id $id",    
-            ];   
-        } else {
-            $book->update($request->all());
+        $data = Book::find($id);
+        if ($data == null) {
             return response([
-                'data' => new BookResource($book), 
-                'message' => 'Update successfully',
-                'status' => '200 OK'],
-                 200);
+                'status' => 404,
+                'message' => "Tidak ada data dengan id $id",
+            ], 404);
+        } else {
+            $data->update($request->all());
+            return response(
+                [
+                    'message' => 'Update successfully',
+                    'status' => 200,
+                    'data' => new BookResource($data)
+                ],
+                200
+            );
         }
-        // $books = Book::findOrFail($id);
-        // $books->title = $request->title;
-        // $books->description = $request->description;
-        // $books->author = $request->author;
-        // $books->publisher = $request->publisher;
-        // $books->date_of_issue = $request->date_of_issue;
-        // if($books->save()){
-        //     return new BookResource($books);
-        // }
     }
 
     /**
@@ -144,18 +139,21 @@ class BookController extends Controller
     public function delete($id)
     {
         $book = Book::find($id);
-        if($book == null){
-            return [
-                'status' => '200 OK',
-                'message' => "Tidak ada data dengan id $id",    
-            ];   
+        if ($book == null) {
+            return response([
+                'status' => 404,
+                'message' => "Tidak ada data dengan id $id",
+            ], 404);
         } else {
             $book->delete();
-            return response([
-                'data' => new BookResource($book), 
-                'message' => 'Delete successfully',
-                'status' => '200 OK'],
-                 200);
+            return response(
+                [
+                    'data' => new BookResource($book),
+                    'message' => 'Delete successfully',
+                    'status' => 204
+                ],
+                204
+            );
         }
     }
 }
