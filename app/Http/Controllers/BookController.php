@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BookResource;
+use Exception;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Validator;
 
@@ -38,18 +39,25 @@ class BookController extends Controller
     public function store(Request $request)
     // title, description. author. publisher. date_of_issue
     {
-        $data = Book::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'author_id' => $request->author_id,
-            'publisher' => $request->publisher,
-            'date_of_issue' => $request->date_of_issue
-        ]);
-        return response([
-            'status' => 200,
-            'message' => 'Data successfully added',
-            'data' => $data,
-        ], 200);
+        try {
+            $data = Book::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'author_id' => $request->author_id,
+                'publisher' => $request->publisher,
+                'date_of_issue' => $request->date_of_issue
+            ]);
+            return response([
+                'status' => 200,
+                'message' => 'Data successfully added',
+                'data' => $data,
+            ], 200);
+        } catch (Exception $exception) {
+            return response([
+                'status' => 404,
+                'message' => 'Author not found',
+            ], 404);
+        }
     }
 
     /**
