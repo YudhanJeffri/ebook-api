@@ -17,9 +17,10 @@ class CreateBookTable extends Migration
         // publisher. date_of_issue. create_at, update_at.
         Schema::create('book', function (Blueprint $table) {
             $table->id();
-            $table->string('title',100);
+            $table->unsignedBigInteger('author_id');
+            $table->foreign('author_id')->references('id')->on('authors')->onUpdate('cascade')->onDelete('cascade');
+            $table->string('title', 100);
             $table->text('description');
-            $table->string('author',100);
             $table->text('publisher');
             $table->date('date_of_issue');
             $table->timestamps();

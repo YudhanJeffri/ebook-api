@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Authors;
+use App\Http\Resources\AuthorResource;
 use Illuminate\Http\Request;
-use App\Models\Book;
-use Illuminate\Support\Facades\DB;
-use App\Http\Resources\BookResource;
-use GuzzleHttp\Promise\Create;
-use Illuminate\Support\Facades\Validator;
 
-class BookController extends Controller
+class AuthorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,16 +15,23 @@ class BookController extends Controller
      */
     public function index()
     {
-        $data = Book::get();
+        $data = Authors::get();
         return response([
             'status' => 200,
             'message' => 'data terload',
             'data' => $data,
         ], 200);
-        // $books = Book::paginate(20);
-        // return BookResource::collection($books);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -36,14 +40,15 @@ class BookController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    // title, description. author. publisher. date_of_issue
+    //id, name, date_of_birh, place_of_birth, gender, email, hp, create_at, update_at.
     {
-        $data = Book::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'author_id' => $request->author_id,
-            'publisher' => $request->publisher,
-            'date_of_issue' => $request->date_of_issue
+        $data = Authors::create([
+            'name' => $request->name,
+            'date_of_birth' => $request->date_of_birth,
+            'place_of_birth' => $request->place_of_birth,
+            'gender' => $request->gender,
+            'email' => $request->email,
+            'hp' => $request->hp
         ]);
         return response([
             'status' => 200,
@@ -60,7 +65,7 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $data = Book::find($id);
+        $data = Authors::find($id);
         if ($data == null) {
             return response([
                 'status' => 404,
@@ -72,22 +77,6 @@ class BookController extends Controller
                 'message' => 'Data terload',
                 'data' => $data,
             ], 200);
-        }
-    }
-    public function search($title)
-    {
-        $data = Book::where('title', 'LIKE', "%$title%")->get();
-        if (count($data) > 0) {
-            return response([
-                'status' => 200,
-                'message' => 'Data successful loaded',
-                'data' => $data,
-            ], 200);
-        } else {
-            return response([
-                'status' => 404,
-                'message' => "Tidak ada data dengan title $title",
-            ], 404);
         }
     }
 
@@ -111,7 +100,7 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = Book::find($id);
+        $data = Authors::find($id);
         if ($data == null) {
             return response([
                 'status' => 404,
@@ -123,7 +112,7 @@ class BookController extends Controller
                 [
                     'message' => 'Update successfully',
                     'status' => 200,
-                    'data' => new BookResource($data)
+                    'data' => new AuthorResource($data)
                 ],
                 200
             );
@@ -136,19 +125,19 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete($id)
+    public function destroy($id)
     {
-        $book = Book::find($id);
-        if ($book == null) {
+        $authors = Authors::find($id);
+        if ($authors == null) {
             return response([
                 'status' => 404,
                 'message' => "Tidak ada data dengan id $id",
             ], 404);
         } else {
-            $book->delete();
+            $authors->delete();
             return response(
                 [
-                    'data' => new BookResource($book),
+                    'data' => new AuthorResource($authors),
                     'message' => 'Delete successfully',
                     'status' => 200
                 ],
