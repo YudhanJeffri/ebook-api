@@ -12,8 +12,8 @@ class Authors extends Model
     //id, name, date_of_birh, place_of birth, gender, email, hp, create_at, update_at.
     protected $table = "authors";
     protected $fillable = ['name', 'date_of_birth', 'place_of_birth', 'gender', 'email', 'hp'];
-    public function authors()
+    public function book()
     {
-        return $this->hasMany(Book::class);;
+        return $this->hasMany(Book::class);
     }
 }

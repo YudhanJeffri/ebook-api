@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BookResource;
+use App\Models\Authors;
 use Exception;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Validator;
@@ -19,7 +20,21 @@ class BookController extends Controller
      */
     public function index()
     {
+
+
+        /* $ayat = [
+            'id' => 1,
+            'ayat' => 1,
+            'bunyi' => "Negara Indonesia ialah Negara Kesatuan yang berbentuk Republik.",
+            'created_at' => "2021-09-24T07:53:19.000000Z",
+            'updated_at' => "2021-09-24T07:53:19.000000Z",
+
+        ]; */
         $data = Book::get();
+        $author = [
+            'author' => Authors::get()
+        ];
+
         return response([
             'status' => 200,
             'message' => 'data terload',
@@ -68,7 +83,10 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $data = Book::find($id);
+        /* $data = Book::find($id);
+        $authors_id = Book::select('author_id')->where('id', $id)->get();
+        $authors = Authors::where('id', Book::pluck("author_id"))->get(); */
+        $data = Book::with('authors')->find($id);
         if ($data == null) {
             return response([
                 'status' => 404,
