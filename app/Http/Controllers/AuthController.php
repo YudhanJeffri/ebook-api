@@ -2,90 +2,95 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function register(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+        ]);
+        //dd("registarsi berhasil");
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $request->session()->flash('success', 'Registration successfull! Please login!');
+        return redirect('/login');
+
+        /* return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]); */
+    }
+    public function login(Request $request)
+    {
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return back()->with('loginError', 'Login failed!');
+        } /* elseif (Auth::attempt($request)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/dashboard');
+        }
+        return back()->with('loginError', 'Login failed!'); */
+
+        $user = User::where('email', $request['email'])->firstOrFail();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        //$request->session()->regenerate();
+        //return redirect()->intended('/');
+        /* 
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]); */
+        Session::put('access_token', $token);
+        return redirect('/');
+        /* return view('buku.index', [
+            'tittle' => 'Login',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]); */
+    }
+    public function indexLogin()
+    {
+        return view('login.index', [
+            'halaman' => 'book',
+        ]);
+    }
+    public function indexRegister()
+    {
+        return view('register.index', [
+            'halaman' => 'book',
+        ]);
+    }
+    public function logout()
+    {
+        Session::flush();
+        return redirect('/');
+    }
+    public function me(Request $request)
+    {
+        return $request->user();
+    }
     public function index()
     {
-        return [
-            'siswa' => [
-                'nis' => '303119198',
-                'name' => 'Yudhan Jeffri Djuniartha',
-                'phone' => '0895346060631',
-                'class' => 'XII RPL 6'
-            ]
-        ];
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $data = User::get();
+        return response([
+            'status' => 200,
+            'message' => 'data terload',
+            'data' => $data,
+        ], 200);
     }
 }

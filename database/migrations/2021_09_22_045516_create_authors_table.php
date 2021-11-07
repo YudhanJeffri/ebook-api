@@ -16,12 +16,12 @@ class CreateAuthorsTable extends Migration
         //id, name, date_of_birh, place_of birth, gender, email, hp, create_at, update_at.
         Schema::create('authors', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 200);
-            $table->date('date_of_birth', 200);
-            $table->string('place_of_birth', 200);
-            $table->string('gender', 100);
-            $table->string('email', 100);
-            $table->string('hp', 30);
+            $table->string('name', 100);
+            $table->date('date_of_birth', 15);
+            $table->string('place_of_birth', 50);
+            $table->string('gender', 12);
+            $table->text('author_description');
+            $table->string('author_image');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\AuthControllerME;
 use App\Models\Authors;
 
 /*
@@ -18,26 +19,29 @@ use App\Models\Authors;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// task migration
-Route::GET('/books', [BookController::class, 'index']);
-Route::POST('/books', [BookController::class, 'store']);
-// get data use title
-Route::GET('/books/search/{title}', [BookController::class, 'search']);
-// get data use id
-Route::GET('/books/{id}', [BookController::class, 'show']);
-Route::PUT('/books/{id}', [BookController::class, 'update']);
-Route::DELETE('/books/{id}', [BookController::class, 'delete']);
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    //  book
+    Route::POST('/books', [BookController::class, 'store']);
+    Route::PUT('/books/{id}', [BookController::class, 'update']);
+    Route::DELETE('/books/{id}', [BookController::class, 'delete']);
+    //  author
+    Route::POST('/authors', [AuthorController::class, 'store']);
+    Route::PUT('authors/{id}', [AuthorController::class, 'update']);
+    Route::DELETE('authors/{id}', [AuthorController::class, 'destroy']);
+});
 
-// endpoint task
-Route::GET('/me', [AuthController::class, 'index']);
-
-// (/authors ==> GET, POST; authorsi{(id} ==> GET, PUT, DELETE)
 Route::GET('/authors', [AuthorController::class, 'index']);
-Route::POST('/authors', [AuthorController::class, 'store']);
 Route::GET('authors/{id}', [AuthorController::class, 'show']);
-Route::PUT('authors/{id}', [AuthorController::class, 'update']);
-Route::DELETE('authors/{id}', [AuthorController::class, 'destroy']);
+
+Route::GET('/books', [BookController::class, 'index']);
+Route::GET('/books/search/{title}', [BookController::class, 'search']);
+Route::GET('/books/{id}', [BookController::class, 'show']);
+// auth
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
+Route::get('/user', [AuthController::class, 'index']);

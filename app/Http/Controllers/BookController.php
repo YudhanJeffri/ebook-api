@@ -9,6 +9,7 @@ use App\Http\Resources\BookResource;
 use App\Models\Authors;
 use Exception;
 use GuzzleHttp\Promise\Create;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
@@ -18,30 +19,27 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function detailBook($id)
+    {
+        $data = Book::with('authors')->where('id', $id)->first();
+
+        return view('layouts.detailBook', compact('data'));
+    }
     public function index()
     {
+        $notFound = "";
+        $data = Book::latest();
+        $filter = $data->filter(request(['search']))->paginate(8)->withQueryString();
 
+        if (count($data->get()) == 0) {
+            $notFound = "Buku tidak ditemukan";
+        }
 
-        /* $ayat = [
-            'id' => 1,
-            'ayat' => 1,
-            'bunyi' => "Negara Indonesia ialah Negara Kesatuan yang berbentuk Republik.",
-            'created_at' => "2021-09-24T07:53:19.000000Z",
-            'updated_at' => "2021-09-24T07:53:19.000000Z",
-
-        ]; */
-        $data = Book::get();
-        $author = [
-            'author' => Authors::get()
-        ];
-
-        return response([
-            'status' => 200,
-            'message' => 'data terload',
-            'data' => $data,
-        ], 200);
-        // $books = Book::paginate(20);
-        // return BookResource::collection($books);
+        return view('buku.index', [
+            'halaman' => 'book',
+            'book' => $filter,
+            'notfound' => $notFound
+        ]);
     }
 
 
@@ -54,25 +52,34 @@ class BookController extends Controller
     public function store(Request $request)
     // title, description. author. publisher. date_of_issue
     {
+
         try {
-            $data = Book::create([
-                'title' => $request->title,
-                'description' => $request->description,
-                'author_id' => $request->author_id,
-                'publisher' => $request->publisher,
-                'date_of_issue' => $request->date_of_issue
+            Book::create([
+                "title" => $request->title,
+                "description" => $request->description,
+                "book_image" => $request->file('image')->store('book-image'),
+                "publisher" => $request->publisher,
+                "author_id" => $request->author_id,
+                "count_book" => $request->count_book,
+                "date_of_issue" => $request->date_of_issue,
+
             ]);
-            return response([
-                'status' => 200,
-                'message' => 'Data successfully added',
-                'data' => $data,
-            ], 200);
-        } catch (Exception $exception) {
-            return response([
-                'status' => 404,
-                'message' => 'Author not found',
-            ], 404);
+
+            $request->session()->flash('successTambah', 'Buku berhasil di tambah!');
+            return redirect('/');
+        } catch (Exception $ex) {
+            $request->session()->flash('gagalTambah',  $ex->getMessage());
+            return redirect('/');
         }
+    }
+
+    public function indexForm()
+    {
+        $author = Authors::get();
+        return view('layouts.crud.addBook',  [
+            'halaman' => 'book',
+            'author' => $author
+        ]);
     }
 
     /**
@@ -100,21 +107,20 @@ class BookController extends Controller
             ], 200);
         }
     }
-    public function search($title)
+    public function search()
     {
-        $data = Book::where('title', 'LIKE', "%$title%")->get();
+        //dd(request('search'));
+        /* $data = Book::where('title', 'LIKE', "%$title%")->get();
         if (count($data) > 0) {
-            return response([
-                'status' => 200,
-                'message' => 'Data successful loaded',
-                'data' => $data,
-            ], 200);
+            return view('buku.index', [
+                'book' => $data,
+            ]);
         } else {
             return response([
                 'status' => 404,
                 'message' => "Tidak ada data dengan title $title",
             ], 404);
-        }
+        } */
     }
 
     /**
@@ -135,25 +141,42 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function editForm($id)
+    {
+        $data = Book::where('id', $id)->first();
+
+        $author = Authors::get();
+        return view('layouts.crud.editBook',  [
+            'halaman' => 'book',
+            'author' => $author,
+            'data' => $data
+        ]);
+    }
     public function update(Request $request, $id)
     {
+
         $data = Book::find($id);
-        if ($data == null) {
-            return response([
-                'status' => 404,
-                'message' => "Tidak ada data dengan id $id",
-            ], 404);
-        } else {
-            $data->update($request->all());
-            return response(
-                [
-                    'message' => 'Update successfully',
-                    'status' => 200,
-                    'data' => new BookResource($data)
-                ],
-                200
-            );
+
+        if ($request->hasFile('image')) {
+            $request->validate([
+                'image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
+            ]);
+            if ($data->book_image) {
+                Storage::delete($data->book_image);
+            }
+            $path = $request->file('image')->store('book-image');
+            $data->book_image = $path;
         }
+        $data->title = $request->title;
+        $data->description = $request->description;
+        $data->publisher = $request->publisher;
+        $data->author_id = $request->author_id;
+        $data->count_book = $request->count_book;
+        $data->date_of_issue = $request->date_of_issue;
+        $data->save();
+        return redirect('/')->with('status', 'Buku berhasil di Edit');
+        //url('/detailBook/' . $data->id)
+
     }
 
     /**
@@ -162,24 +185,16 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete($id)
+    public function delete(Book $book, $id)
     {
-        $book = Book::find($id);
-        if ($book == null) {
-            return response([
-                'status' => 404,
-                'message' => "Tidak ada data dengan id $id",
-            ], 404);
-        } else {
-            $book->delete();
-            return response(
-                [
-                    'data' => new BookResource($book),
-                    'message' => 'Delete successfully',
-                    'status' => 200
-                ],
-                200
-            );
+        try {
+            Book::destroy($id);
+            if ($book->book_image) {
+                Storage::delete($book->book_image);
+            }
+            return redirect('/')->with('statusDeleteSuccess', 'Buku berhasil dihapus !');
+        } catch (Exception $ex) {
+            return redirect('/')->with('statusDelete', 'Buku gagal dihapus / terjadi kesalahan !');
         }
     }
 }

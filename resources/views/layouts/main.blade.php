@@ -1,0 +1,88 @@
+@php
+$halaman;
+@endphp
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/styleauth.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <title>Daftar {{ $halaman }}</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <a class="navbar-brand" >PERPUSAJA</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link {{ ($halaman === "book") ? 'active' : '' }}" aria-current="page" href="/">Daftar Buku</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {{ ($halaman === "pengarang") ? 'active' : '' }}" aria-current="page" href="/pengarang">Daftar Pengarang</a>
+              </li>
+              <li class="nav-item">
+                
+                @if ( Session::get('access_token') != null)
+                  @if ($halaman === 'pengarang')
+                  <a class="nav-link active" href="/addPengarang" >Tambah Pengarang</a>
+                  @elseif($halaman === 'book') 
+                  <a class="nav-link active" href="/addBook" >Tambah Buku</a>    
+                  @endif
+                  
+                @else 
+                  <a class="nav-link active" href="/login" >Tambah Buku</a>
+                @endif
+              </li>
+              {{-- <li class="nav-item">
+                <a class="nav-link active" href="#">About</a>
+              </li> --}}
+            </ul>
+            <form class="d-flex ms-auto" action="/">
+              <input class="form-control me-2" type="search" name="search" placeholder="judul, pengarang" aria-label="Search" value="{{ request('search') }}">
+              <button class="btn btn-outline-primary me-5" type="submit">Search</button>
+            </form>
+            @if ( Session::get('access_token') != null)
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="/logout" class="nav-link" ><i class="bi bi-box-arrow-right me-1"></i>Logout</a>
+                </li>
+            </ul>
+            @else
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="/login" class="nav-link" ><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>
+                </li>
+            </ul>
+                
+            @endif
+            
+          </div>
+        </div>
+      </nav>
+      <main class="container mt-4 mb-4">
+          @yield('container')
+      </main>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</body>
+<script>
+  function previewImage(){
+    const image = document.querySelector('#image');
+    const imgPreview = document.querySelector('.img-preview');
+    imgPreview.style.display = 'block';
+    const oFReader = new FileReader();
+    oFReader.readAsDataURL(image.files[0]);
+    oFReader.onload = function(oFREvent){
+      imgPreview.src = oFREvent.target.result;
+    }
+  }
+
+</script>
+</html>
