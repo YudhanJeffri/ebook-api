@@ -1,0 +1,4 @@
+/* Landing Page */
+.jumbotron{
+    background-image: {{ URL::asset('css/css.css'); }} 
+}

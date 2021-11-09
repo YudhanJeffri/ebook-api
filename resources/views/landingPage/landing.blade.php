@@ -2,9 +2,38 @@
 $halaman;
 @endphp
 <!DOCTYPE html>
-<html lang="en">
 <head>
+    <style>
+        body{
+           background: black !important;
+        }
+        .jumbotron {
+            
+            background-size: cover;
+            height: 900px;
+            text-align: center;
+            background-image:  url({{ asset('storage/landing-image/cover_landing_page.png') }});
+            
+        }
+        .pooter{
+            margin-top: -75px;
+        }
+        .jumbotron .display-4 {
+            color: white;
+           margin-bottom: 30px;
+            margin-top: 150px;
+            font-weight: 200;
+
+        }
+        .jumbotron .display-4 span {
+            font-weight: 500;
+        }
+    </style>
+    
+    <link rel="stylesheet" href="/public/css/styleLanding.css">
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
@@ -12,7 +41,7 @@ $halaman;
     <script src="/resources/views/ckeditor/ckeditor.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
-    <title>Daftar {{ $halaman }}</title>
+    <title>PERPUSAJA</title>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -72,32 +101,50 @@ $halaman;
           </div>
         </div>
       </nav>
-      <main class="container mt-4 mb-4">
-          @yield('container')
-      </main>
-      
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+      <div class="jumbotron jumbotron-fluid">
+        <div>
+          <h1 class="display-4">Temukan <span>Buku</span> lebih lengkap dan <br><span>Penulis</span> dengan <span>PERPUSAJA</span></h1>
+          @if ( Session::get('access_token') == null)
+          
+          <ul class="navbar-nav">
+            <li class="nav-item">
+                <a href="/login" class="btn btn-primary tombol">Login Sekarang</a>
+            </li>
+        </ul>
+                
+            @endif
+          
+        </div>
+      </div>
+      <footer class="bg-dark text-center text-white pooter">
+        <div class="container p-4 pb-0">
+          <section class="">
+            <form action="">
+              <div class="row d-flex justify-content-center">
+                <div class="col-auto">
+                  <p class="pt-2">
+                    <strong>Update buku setiap hari</strong>
+                  </p>
+                </div>
+                <div class="col-md-5 col-12">
+                  <div class="form-outline form-white mb-4">
+                    <input type="email" placeholder="Berlangganan Sekarang Juga !!" id="form5Example29" class="form-control" />
+                    <label class="form-label" for="form5Example29">Email address</label>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-outline-light mb-4">
+                    Subscribe
+                  </button>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+          © 2020 Copyright:
+          <a class="text-white" href="https://github.com/YudhanJeffri">Yudhan Jeffri Djuniartha</a>
+        </div>
+      </footer>
 </body>
-<script>
-  function previewImage(){
-    const image = document.querySelector('#image');
-    const imgPreview = document.querySelector('.img-preview');
-    imgPreview.style.display = 'block';
-    const oFReader = new FileReader();
-    oFReader.readAsDataURL(image.files[0]);
-    oFReader.onload = function(oFREvent){
-      imgPreview.src = oFREvent.target.result;
-    }
-  }
-        ClassicEditor
-                .create( document.querySelector( '#description' ) )
-                .then( editor => {
-                        console.log( editor );
-                } )
-                .catch( error => {
-                        console.error( error );
-                } );
-  
-  
-</script>
 </html>

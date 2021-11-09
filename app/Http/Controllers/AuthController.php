@@ -53,7 +53,7 @@ class AuthController extends Controller
     public function logout()
     {
         Session::flush();
-        return redirect('/');
+        return redirect('/landingPage');
     }
     public function me(Request $request)
     {

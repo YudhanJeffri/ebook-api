@@ -39,6 +39,7 @@ Route::get('/pengarang', [AuthorController::class, 'index']);
 Route::get('/addPengarang', [AuthorController::class, 'indexForm']);
 
 Route::get('/', [BookController::class, 'index']);
+Route::get('/landingPage', [BookController::class, 'landingPage']);
 
 Route::get('/login', [AuthController::class, 'indexLogin']);
 Route::get('/register', [AuthController::class, 'indexRegister']);

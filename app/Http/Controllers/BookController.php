@@ -217,4 +217,10 @@ class BookController extends Controller
             return redirect('/')->with('statusDelete', 'Buku gagal dihapus / terjadi kesalahan !');
         }
     }
+    public function landingPage()
+    {
+        return view('landingPage.landing', [
+            'halaman' => 'book',
+        ]);
+    }
 }
