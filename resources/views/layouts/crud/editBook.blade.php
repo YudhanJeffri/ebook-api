@@ -4,6 +4,12 @@
       $halaman = "book";
   @endphp
   <h1>Edit Buku</h1>
+  @if (session()->has('statusAuthor'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ session('statusAuthor') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
   <form action="{{ url('/bookUpdate/'.$data->id) }}" enctype="multipart/form-data" method="POST">
     @csrf
     @method('PUT')
@@ -14,9 +20,12 @@
       @error('title')
       <div class="alert alert-danger">{{ $message }}</div>
       @enderror
+      <div>
+        <label for="description">Deskripsi</label>
+      </div>
       <div class="form-floating mb-3">
         <textarea class="form-control" placeholder="Description" name="description" id="description" style="height: 100px" required  @error('description') is-invalid @enderror>{{ $data->description }}</textarea>
-        <label for="description">Deskripsi</label>
+        
       </div>
       @error('description')
       <div class="alert alert-danger">{{ $message }}</div>
@@ -28,9 +37,18 @@
       @error('publisher')
       <div class="alert alert-danger">{{ $message }}</div>
       @enderror
+      @if ($author == "")
       <div class="form-floating mb-3"> 
         <input type="text" name="author_id" list="browsers" class="form-control" 
-        placeholder="author_id" maxlength="100" required @error('author_id') is-invalid @enderror>
+        placeholder="author_id" maxlength="100" required @error('author_id') is-invalid @enderror disabled readonly>
+        
+      <label for="author_id">Belum ada pengarang</label>
+    </div>
+    
+      @else
+      <div class="form-floating mb-3"> 
+        <input type="text" name="author_id" list="browsers" class="form-control" 
+        placeholder="author_id" value="{{ $data->author_id }}" maxlength="100" required @error('author_id') is-invalid @enderror>
         <datalist id="browsers">
           @foreach ($author as $item)
           <option value="{{ $item->id }}" id="author_id">{{ $item->name }}
@@ -38,7 +56,10 @@
       </datalist>
       <label for="author_id">Pengarang</label>
     </div>
-      @error('author')
+
+      @endif
+     
+      @error('author_id')
       <div class="alert alert-danger">{{ $message }}</div>
       @enderror
       <div class="form-floating mb-3">

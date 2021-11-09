@@ -30,9 +30,12 @@
           </div>
         
     </div>
+    <div>
+      <label for="description">Deskripsi</label>
+    </div>
     <div class="form-floating mb-3">
       <textarea class="form-control" placeholder="Description" name="author_description" id="description" style="height: 100px" required  @error('author_description') is-invalid @enderror></textarea>
-      <label for="description">Deskripsi Pengarang</label>
+     
     </div>
     @error('author_description')
     <div class="alert alert-danger">{{ $message }}</div>
@@ -40,8 +43,11 @@
     <div>
       <label for="image" class="form-label">Upload gambar Pengarang</label>
     </div>
+    <div>
+      <img class="img-preview img-fluid mb-3 col-sm-3">
+    </div>
     <div class="input-group mb-3">  
-      <input required  type="file" class="form-control" id="author_image" name="author_image" @error('author_image') is-invalid @enderror>
+      <input required type="file" onchange="previewImage()" class="form-control" id="image" name="author_image" @error('author_image') is-invalid @enderror>
     </div>
     @error('author_image')
     <div class="alert alert-danger">{{ $message }}</div>

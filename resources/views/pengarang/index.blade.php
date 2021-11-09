@@ -47,10 +47,9 @@
                     <p class="card-title">@php
                         echo Str::limit($data->author_description, 100)
                     @endphp  </p>
-                    <p class="card-text">{{ $data->date_of_birth }} <br>
+                     <p class="card-text"><small class="text-muted">Last updated at {{ $data->updated_at }}</small></p>
                         {{$data->keterangan}}
                     </p>
-                    {{-- <a href="{{ url('detailAuthor') }}/{{ $data->id }}" class="btn btn-primary">Lihat Detail</a> --}}
                     <div class="d-grid gap-2 mx-auto">
                     
                       <a href="{{ url('detailAuthor') }}/{{ $data->id }}" class="btn btn-primary">Lihat Detail</a>
@@ -67,15 +66,12 @@
                         <button type="submit" class="btn btn-danger"onclick="return confirm('yakin?');">Delete</button>
                       </form>
                       @else
-                          <a class="btn btn-danger" href="/login" >Delete</a>
+                          <a class="btn btn-danger mt-2" href="/login" >Delete</a>
                       @endif
                   </div>
                 </div>
                 </div>
             @endforeach
-           {{--  <div class="d-flex justify-content-center">
-              {!! $data->links() !!}
-          </div> --}}
     </div>
   </div>
   <div class="container mt-4 mb-4 d-flex justify-content-end">

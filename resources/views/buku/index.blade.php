@@ -18,9 +18,14 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{-- session edit --}}
-    @elseif (session()->has('status'))
+    @elseif (session()->has('successEdit'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      {{ session('status') }}
+      {{ session('successEdit') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @elseif (session()->has('gagalEdit'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ session('gagalEdit') }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {{-- session delete --}}
@@ -34,6 +39,7 @@
       {{ session('statusDeleteSuccess') }}
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    
     @endif
     <h1>{{ $notfound }}</h1>
         
@@ -47,8 +53,8 @@
                   <p class="card-title">@php
                       echo Str::limit($data->description, 100)
                   @endphp  </p>
-                  <p class="card-text">{{ $data->date_of_issue }} <br>
-                      {{$data->keterangan}}
+                  <p class="card-text">Tanggal rilis : {{ $data->date_of_issue }} <br>
+                      {{-- {{$data->keterangan}} --}}
                   </p>
                   <div class="d-grid gap-2 mx-auto">
                     
@@ -66,15 +72,12 @@
                     <button type="submit" class="btn btn-danger"onclick="return confirm('yakin?');">Delete</button>
                   </form>
                   @else
-                      <a class="btn btn-danger" href="/login" >Delete</a>
+                      <a class="btn btn-danger mt-2" href="/login" >Delete</a>
                   @endif
                 </div>
               </div>
               </div>
           @endforeach
-         {{--  <div class="d-flex justify-content-center">
-            {!! $data->links() !!}
-        </div> --}}
   </div>
 </div>
 <div class="container mt-4 mb-4 d-flex justify-content-end">

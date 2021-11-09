@@ -12,7 +12,6 @@
           <div class="col-md-8">
             <div class="card-body">
               <h2 class="card-title">{{ $data->name }}</h2>
-        
               <p>Tempat Tanggal Lahir : {{ $data->date_of_birth }}, {{ $data->place_of_birth }}</p>
               <p>Gender   : {{ $data->gender }}</p>
               <span> Deskripsi : </span>
@@ -21,13 +20,21 @@
               @endphp  </p>
               <p class="card-text"><small class="text-muted">Last updated at {{ $data->updated_at }}</small></p>
               <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button class="btn btn-primary me-md-2" type="button">Edit</button>
-                <button class="btn btn-danger" type="button">Delete</button>
+                  @if ( Session::get('access_token') != null)
+                    <a class="btn btn-primary" href="{{ url('editPengarang') }}/{{ $data->id }}" class="btn btn-primary">Edit Pengarang</a>
+                @else
+                    <a class="btn btn-primary" href="/login" >Edit Pengarang</a>
+                @endif
+                  @if (Session::get('access_token') != null)
+                  <form method="POST" class="justify-content-md-end" action="/deletePengarang/{{ $data->id }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger"onclick="return confirm('yakin?');">Delete</button>
+                  </form>
+                  @else
+                      <a class="btn btn-danger mt-2" href="/login" >Delete</a>
+                  @endif
               </div>
-              {{-- <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-primary btn-lg">Edit</button>
-                <button type="button" class="btn btn-danger btn-lg ms-4">Delete</button>
-              </div> --}}
             </div>
             
           </div>
@@ -60,7 +67,7 @@
                 @endif
                   </div>
                   @if (Session::get('access_token') != null)
-                  <form method="POST" class="justify-content-md-end mt-2" action="/deleteBook/{{ $book->id }}">
+                  <form method="POST" class="justify-content-md-end" action="/deleteBook/{{ $book->id }}">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger"onclick="return confirm('yakin?');">Delete</button>
@@ -74,9 +81,5 @@
           @endforeach
         </div>
         </div>
-        
-      
-    {{-- <img src="{{ asset('storage/' . $data->book_image) }}" width="300" height="500" alt="">
-    <h1>{{ $data->title }}</h1> --}}
 </div>
 @endsection

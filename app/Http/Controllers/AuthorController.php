@@ -22,22 +22,28 @@ class AuthorController extends Controller
     }
     public function detailAuthor($id)
     {
-        $data = Authors::with('book')->where('id', $id)->first();
+        try {
+            $data = Authors::with('book')->where('id', $id)->first();
 
-        return view('pengarang.detailPengarang', compact('data'));
+            return view('pengarang.detailPengarang', compact('data'));
+        } catch (Exception $ex) {
+            return redirect('/')->with('gagalTambah',  $ex->getMessage());
+        }
     }
     public function index()
     {
         $notFound = "";
         $author = Authors::latest();
+        $filter = $author->filter(request(['search']))->paginate(8)->withQueryString();
+
 
         if (count($author->get()) == 0) {
-            $notFound = "Penagarang tidak ditemukan";
+            $notFound = "Pengarang tidak ditemukan";
         }
 
         return view('pengarang.index', [
             'halaman' => 'pengarang',
-            'pengarang' => $author->filter(request(['search']))->paginate(8)->withQueryString(),
+            'pengarang' => $filter,
             'notfound' => $notFound
         ]);
     }
@@ -53,6 +59,7 @@ class AuthorController extends Controller
     }
     public function indexForm()
     {
+
         return view('layouts.crudPengarang.addPengarang', [
             'halaman' => 'pengarang',
         ]);

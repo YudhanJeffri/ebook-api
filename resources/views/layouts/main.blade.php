@@ -8,12 +8,13 @@ $halaman;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/css/styleauth.css">
+    <script src="https://cdn.ckeditor.com/ckeditor5/31.0.0/classic/ckeditor.js"></script>
+    <script src="/resources/views/ckeditor/ckeditor.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
     <title>Daftar {{ $halaman }}</title>
 </head>
 <body>
-
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
           <a class="navbar-brand" >PERPUSAJA</a>
@@ -41,14 +42,18 @@ $halaman;
                   <a class="nav-link active" href="/login" >Tambah Buku</a>
                 @endif
               </li>
-              {{-- <li class="nav-item">
-                <a class="nav-link active" href="#">About</a>
-              </li> --}}
             </ul>
+            @if ($halaman === 'book')
             <form class="d-flex ms-auto" action="/">
               <input class="form-control me-2" type="search" name="search" placeholder="judul, pengarang" aria-label="Search" value="{{ request('search') }}">
               <button class="btn btn-outline-primary me-5" type="submit">Search</button>
             </form>
+            @elseif($halaman === 'pengarang')
+            <form class="d-flex ms-auto" action="/pengarang">
+              <input class="form-control me-2" type="search" name="search" placeholder="judul, pengarang" aria-label="Search" value="{{ request('search') }}">
+              <button class="btn btn-outline-primary me-5" type="submit">Search</button>
+            </form>
+            @endif
             @if ( Session::get('access_token') != null)
             <ul class="navbar-nav">
                 <li class="nav-item">
@@ -83,6 +88,15 @@ $halaman;
       imgPreview.src = oFREvent.target.result;
     }
   }
-
+        ClassicEditor
+                .create( document.querySelector( '#description' ) )
+                .then( editor => {
+                        console.log( editor );
+                } )
+                .catch( error => {
+                        console.error( error );
+                } );
+  
+  
 </script>
 </html>

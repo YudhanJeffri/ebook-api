@@ -34,11 +34,7 @@ Route::get('/editBook/{id}', [BookController::class, 'editForm']);
 Route::get('/editPengarang/{id}', [AuthorController::class, 'editForm']);
 Route::get('/addBook', [BookController::class, 'indexForm']);
 Route::get('/detailBuku/{id}', [BookController::class, 'detailBook']);
-
 Route::get('/detailAuthor/{id}', [AuthorController::class, 'detailAuthor']);
-
-//Route::get('/search', [BookController::class, 'search']);
-
 Route::get('/pengarang', [AuthorController::class, 'index']);
 Route::get('/addPengarang', [AuthorController::class, 'indexForm']);
 

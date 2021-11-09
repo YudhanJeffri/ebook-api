@@ -34,7 +34,7 @@
                     <a class="btn btn-primary" href="/login" >Edit Buku</a>
                 @endif
                 @if (Session::get('access_token') != null)
-                <form method="POST" action="/deleteBook/{{ $data->id }}">
+                <form method="POST"  action="/deleteBook/{{ $data->id }}">
                   @csrf
                   @method('DELETE')
                   <button type="submit" class="btn btn-danger"onclick="return confirm('yakin?');">Delete</button>
@@ -45,13 +45,8 @@
                 
               </div>
             </div>
-            
           </div>
-        
         </div>
       </div>
-
-    {{-- <img src="{{ asset('storage/' . $data->book_image) }}" width="300" height="500" alt="">
-    <h1>{{ $data->title }}</h1> --}}
 </div>
 @endsection

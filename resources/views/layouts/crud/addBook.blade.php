@@ -4,6 +4,12 @@
     $halaman;
 @endphp
 <h1>Tambah Buku</h1>
+@if (session()->has('statusAuthor'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ session('statusAuthor') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 <form action="/bookStore" enctype="multipart/form-data" method="POST">
   @csrf
     <div class="form-floating mb-3">
@@ -13,14 +19,18 @@
     @error('title')
     <div class="alert alert-danger">{{ $message }}</div>
     @enderror
-    <div class="form-floating mb-3">
-      <textarea class="form-control" placeholder="Description" name="description" id="description" style="height: 100px" required  @error('description') is-invalid @enderror></textarea>
+    <div>
       <label for="description">Deskripsi</label>
     </div>
+    <div class="form-floating mb-3" id="description">
+      <textarea class="form-control" id="description" name="description" style="height: 100px" required  @error('description') is-invalid @enderror></textarea>
+    </div>
+    
+               
     @error('description')
     <div class="alert alert-danger">{{ $message }}</div>
     @enderror
-    <div class="form-floating mb-3">
+    <div class="form-floating mb-3 mt-3">
       <input type="text" name="publisher" class="form-control"  placeholder="publisher" maxlength="100" required  @error('publisher') is-invalid @enderror>
       <label for="publisher">Publisher</label>
     </div>
@@ -28,9 +38,19 @@
     <div class="alert alert-danger">{{ $message }}</div>
     @enderror
 
-    <div class="form-floating mb-3"> 
+
+    @if ($author == "")
+      <div class="form-floating mb-3"> 
         <input type="text" name="author_id" list="browsers" class="form-control" 
-        placeholder="author_id" maxlength="100" required @error('author_id') is-invalid @enderror>
+        placeholder="author_id" maxlength="100" required @error('author_id') is-invalid @enderror disabled readonly>
+        
+      <label for="author_id">Belum ada pengarang</label>
+    </div>
+    
+      @else
+      <div class="form-floating mb-3"> 
+        <input type="text" name="author_id" list="browsers" class="form-control" 
+        placeholder="author_id" maxlength="100" id="fname" required @error('author_id') is-invalid @enderror>
         <datalist id="browsers">
           @foreach ($author as $item)
           <option value="{{ $item->id }}" id="author_id">{{ $item->name }}
@@ -38,6 +58,10 @@
       </datalist>
       <label for="author_id">Pengarang</label>
     </div>
+
+      @endif
+
+  
     
     @error('author_id')
     <div class="alert alert-danger">{{ $message }}</div>

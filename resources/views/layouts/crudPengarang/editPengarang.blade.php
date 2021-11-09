@@ -44,9 +44,11 @@
             </div>
           
       </div>
+      <div>
+        <label for="description">Deskripsi Pengarang</label>
+      </div>
       <div class="form-floating mb-3">
         <textarea class="form-control" placeholder="Description" name="author_description" id="description" style="height: 100px" required  @error('author_description') is-invalid @enderror>{{ $data->author_description }}</textarea>
-        <label for="description">Deskripsi Pengarang</label>
       </div>
       @error('author_description')
       <div class="alert alert-danger">{{ $message }}</div>
