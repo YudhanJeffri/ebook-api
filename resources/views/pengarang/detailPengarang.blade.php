@@ -32,7 +32,7 @@
                     <button type="submit" class="btn btn-danger"onclick="return confirm('yakin?');">Delete</button>
                   </form>
                   @else
-                      <a class="btn btn-danger mt-2" href="/login" >Delete</a>
+                      <a class="btn btn-danger" href="/login" >Delete</a>
                   @endif
               </div>
             </div>

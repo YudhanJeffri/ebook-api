@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/deletePengarang/{id}', [AuthorController::class, 'destroy']);
     Route::post('/pengarangStore', [AuthorController::class, 'store']);
 });
+
 Route::get('/editBook/{id}', [BookController::class, 'editForm']);
 Route::get('/editPengarang/{id}', [AuthorController::class, 'editForm']);
 Route::get('/addBook', [BookController::class, 'indexForm']);

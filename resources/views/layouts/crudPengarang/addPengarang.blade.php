@@ -30,11 +30,8 @@
           </div>
         
     </div>
-    <div>
-      <label for="description">Deskripsi</label>
-    </div>
     <div class="form-floating mb-3">
-      <textarea class="form-control" placeholder="Description" name="author_description" id="description" style="height: 100px" required  @error('author_description') is-invalid @enderror></textarea>
+      <textarea class="form-control"  placeholder="Description" name="author_description" id="description" style="height: 100px" required  @error('author_description') is-invalid @enderror></textarea>
      
     </div>
     @error('author_description')
