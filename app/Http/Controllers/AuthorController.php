@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Authors;
 use App\Http\Resources\AuthorResource;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class AuthorController extends Controller
 {
@@ -15,31 +13,14 @@ class AuthorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function editForm($id)
-    {
-        $data = Authors::where('id', $id)->first();
-        return view('layouts.crudPengarang.editPengarang', compact('data'));
-    }
-    public function detailAuthor($id)
-    {
-        $data = Authors::with('book')->where('id', $id)->first();
-
-        return view('pengarang.detailPengarang', compact('data'));
-    }
     public function index()
     {
-        $notFound = "";
-        $author = Authors::latest();
-
-        if (count($author->get()) == 0) {
-            $notFound = "Penagarang tidak ditemukan";
-        }
-
-        return view('pengarang.index', [
-            'halaman' => 'pengarang',
-            'pengarang' => $author->filter(request(['search']))->paginate(8)->withQueryString(),
-            'notfound' => $notFound
-        ]);
+        $data = Authors::get();
+        return response([
+            'status' => 200,
+            'message' => 'data terload',
+            'data' => $data,
+        ], 200);
     }
 
     /**
@@ -51,12 +32,6 @@ class AuthorController extends Controller
     {
         //
     }
-    public function indexForm()
-    {
-        return view('layouts.crudPengarang.addPengarang', [
-            'halaman' => 'pengarang',
-        ]);
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -67,22 +42,19 @@ class AuthorController extends Controller
     public function store(Request $request)
     //id, name, date_of_birh, place_of_birth, gender, email, hp, create_at, update_at.
     {
-
-        try {
-            Authors::create([
-                'name' => $request->name,
-                'date_of_birth' => $request->date_of_birth,
-                'place_of_birth' => $request->place_of_birth,
-                'gender' => $request->gender,
-                'author_description' => $request->author_description,
-                'author_image' => $request->file('author_image')->store('author-image')
-            ]);
-            $request->session()->flash('successTambah', 'Author berhasil di tambah!');
-            return redirect('/pengarang');
-        } catch (Exception $ex) {
-            $request->session()->flash('gagalTambah', 'Author gagal di tambah! error');
-            return redirect('/pengarang');
-        }
+        $data = Authors::create([
+            'name' => $request->name,
+            'date_of_birth' => $request->date_of_birth,
+            'place_of_birth' => $request->place_of_birth,
+            'gender' => $request->gender,
+            'email' => $request->email,
+            'hp' => $request->hp
+        ]);
+        return response([
+            'status' => 200,
+            'message' => 'Data successfully added',
+            'data' => $data,
+        ], 200);
     }
 
     /**
@@ -93,8 +65,7 @@ class AuthorController extends Controller
      */
     public function show($id)
     {
-        //$data = Authors::find($id);
-        $data = Authors::with('book')->find($id);
+        $data = Authors::find($id);
         if ($data == null) {
             return response([
                 'status' => 404,
@@ -129,28 +100,22 @@ class AuthorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $data = Authors::find($id);
-
-            if ($request->hasFile('image')) {
-                $request->validate([
-                    'image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-                ]);
-                if ($data->author_image) {
-                    Storage::delete($data->author_image);
-                }
-                $path = $request->file('image')->store('author-image');
-                $data->author_image = $path;
-            }
-            $data->name = $request->name;
-            $data->date_of_birth = $request->date_of_birth;
-            $data->place_of_birth = $request->place_of_birth;
-            $data->gender = $request->gender;
-            $data->author_description = $request->author_description;
-            $data->save();
-            return redirect('/pengarang')->with('statusSuccess', 'Pengarang berhasil di Edit');
-        } catch (Exception $ex) {
-            return redirect('/pengarang')->with('statusFailed', 'Pengarang gagal di Edit');
+        $data = Authors::find($id);
+        if ($data == null) {
+            return response([
+                'status' => 404,
+                'message' => "Tidak ada data dengan id $id",
+            ], 404);
+        } else {
+            $data->update($request->all());
+            return response(
+                [
+                    'message' => 'Update successfully',
+                    'status' => 200,
+                    'data' => new AuthorResource($data)
+                ],
+                200
+            );
         }
     }
 
@@ -160,17 +125,24 @@ class AuthorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Authors $author, $id)
+    public function destroy($id)
     {
-        try {
-            $data = Authors::find($id);
-            Authors::destroy($id);
-            if ($data->author_image) {
-                Storage::delete($data->author_image);
-            }
-            return redirect('/pengarang')->with('statusDeleteSuccess', 'Pengarang berhasil dihapus !');
-        } catch (Exception $ex) {
-            return redirect('/pengarang')->with('statusDeleteFailed', 'Pengarang gagal dihapus / terjadi kesalahan !');
+        $authors = Authors::find($id);
+        if ($authors == null) {
+            return response([
+                'status' => 404,
+                'message' => "Tidak ada data dengan id $id",
+            ], 404);
+        } else {
+            $authors->delete();
+            return response(
+                [
+                    'data' => new AuthorResource($authors),
+                    'message' => 'Delete successfully',
+                    'status' => 200
+                ],
+                200
+            );
         }
     }
 }

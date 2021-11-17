@@ -22,46 +22,30 @@ class AuthController extends Controller
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
         ]);
-        //dd("registarsi berhasil");
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        $request->session()->flash('success', 'Registration successfull! Please login!');
-        return redirect('/login');
-
-        /* return response()->json([
+        return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]); */
+        ]);
     }
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return back()->with('loginError', 'Login failed!');
-        } /* elseif (Auth::attempt($request)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
-        }
-        return back()->with('loginError', 'Login failed!'); */
-
-        $user = User::where('email', $request['email'])->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        //$request->session()->regenerate();
-        //return redirect()->intended('/');
-        /* 
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]); */
-        Session::put('access_token', $token);
-        return redirect('/');
-        /* return view('buku.index', [
-            'tittle' => 'Login',
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]); */
+            return response()->json([
+            'message' => 'Invalid login details'
+                       ], 401);
+                   }
+            
+            $user = User::where('email', $request['email'])->firstOrFail();
+            
+            $token = $user->createToken('auth_token')->plainTextToken;
+            
+            return response()->json([
+                       'access_token' => $token,
+                       'token_type' => 'Bearer',
+            ]);
     }
     public function indexLogin()
     {

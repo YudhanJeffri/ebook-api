@@ -6,10 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\BookResource;
-use App\Models\Authors;
-use Exception;
-use GuzzleHttp\Promise\Create;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
@@ -19,30 +15,19 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function detailBook($id)
-    {
-        $data = Book::with('authors')->where('id', $id)->first();
-
-        return view('layouts.detailBook', compact('data'));
-    }
     public function index()
     {
-        $notFound = "";
-        $data = Book::latest();
-        $filter = $data->filter(request(['search']))->paginate(8)->withQueryString();
-
-        if (count($data->get()) == 0) {
-            $notFound = "Buku tidak ditemukan";
-        }
-
-        return view('buku.index', [
-            'halaman' => 'book',
-            'book' => $filter,
-            'notfound' => $notFound
-        ]);
+        $books = Book::get();
+    	return [
+            'status' => '200 OK',
+            'message' => 'data terload',
+            'data' => $books,
+        ];
+        // $books = Book::paginate(20);
+        // return BookResource::collection($books);
     }
 
-
+ 
     /**
      * Store a newly created resource in storage.
      *
@@ -52,34 +37,18 @@ class BookController extends Controller
     public function store(Request $request)
     // title, description. author. publisher. date_of_issue
     {
-
-        try {
-            Book::create([
-                "title" => $request->title,
-                "description" => $request->description,
-                "book_image" => $request->file('image')->store('book-image'),
-                "publisher" => $request->publisher,
-                "author_id" => $request->author_id,
-                "count_book" => $request->count_book,
-                "date_of_issue" => $request->date_of_issue,
-
-            ]);
-
-            $request->session()->flash('successTambah', 'Buku berhasil di tambah!');
-            return redirect('/');
-        } catch (Exception $ex) {
-            $request->session()->flash('gagalTambah',  $ex->getMessage());
-            return redirect('/');
-        }
-    }
-
-    public function indexForm()
-    {
-        $author = Authors::get();
-        return view('layouts.crud.addBook',  [
-            'halaman' => 'book',
-            'author' => $author
-        ]);
+        $bookStore = new Book;
+        $bookStore->title = $request->title;
+        $bookStore->description = $request->description;
+        $bookStore->author = $request->author;
+        $bookStore->publisher = $request->publisher;
+        $bookStore->date_of_issue = $request->date_of_issue;
+        $bookStore->save();
+        return [
+            'status' => '200 OK',
+            'message' => 'Data berhasil ditambah',
+            'data' => $bookStore,
+        ];  
     }
 
     /**
@@ -90,37 +59,35 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        /* $data = Book::find($id);
-        $authors_id = Book::select('author_id')->where('id', $id)->get();
-        $authors = Authors::where('id', Book::pluck("author_id"))->get(); */
-        $data = Book::with('authors')->find($id);
-        if ($data == null) {
-            return response([
-                'status' => 404,
-                'message' => "Tidak ada data dengan id $id",
-            ], 404);
+        $book = Book::find($id);
+        if($book == null){
+            return [
+                'status' => '200 OK',
+                'message' => "Tidak ada data dengan id $id",    
+            ];   
         } else {
-            return response([
-                'status' => 200,
-                'message' => 'Data terload',
-                'data' => $data,
-            ], 200);
+        return [
+            'status' => '200 OK',
+            'message' => 'Data terload',
+            'data' => $book,
+        ];   
         }
     }
-    public function search()
+    public function search($title)
     {
-        //dd(request('search'));
-        /* $data = Book::where('title', 'LIKE', "%$title%")->get();
-        if (count($data) > 0) {
-            return view('buku.index', [
-                'book' => $data,
-            ]);
+        $book = Book::where('title','LIKE',"%$title%")->get();
+        if(count($book) > 0){
+            return [
+                'status' => '200 OK',
+                'message' => 'Data successful loaded',
+                'data' => $book,
+            ];      
         } else {
-            return response([
-                'status' => 404,
-                'message' => "Tidak ada data dengan title $title",
-            ], 404);
-        } */
+            return [
+                'status' => '404',
+                'message' => "Tidak ada data dengan title $title",    
+            ];
+        }
     }
 
     /**
@@ -141,42 +108,31 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function editForm($id)
-    {
-        $data = Book::where('id', $id)->first();
-
-        $author = Authors::get();
-        return view('layouts.crud.editBook',  [
-            'halaman' => 'book',
-            'author' => $author,
-            'data' => $data
-        ]);
-    }
     public function update(Request $request, $id)
     {
-
-        $data = Book::find($id);
-
-        if ($request->hasFile('image')) {
-            $request->validate([
-                'image' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
-            ]);
-            if ($data->book_image) {
-                Storage::delete($data->book_image);
-            }
-            $path = $request->file('image')->store('book-image');
-            $data->book_image = $path;
+        $book = Book::find($id);
+        if($book == null){
+            return [
+                'status' => '200 OK',
+                'message' => "Tidak ada data dengan id $id",    
+            ];   
+        } else {
+            $book->update($request->all());
+            return response([
+                'data' => new BookResource($book), 
+                'message' => 'Update successfully',
+                'status' => '200 OK'],
+                 200);
         }
-        $data->title = $request->title;
-        $data->description = $request->description;
-        $data->publisher = $request->publisher;
-        $data->author_id = $request->author_id;
-        $data->count_book = $request->count_book;
-        $data->date_of_issue = $request->date_of_issue;
-        $data->save();
-        return redirect('/')->with('status', 'Buku berhasil di Edit');
-        //url('/detailBook/' . $data->id)
-
+        // $books = Book::findOrFail($id);
+        // $books->title = $request->title;
+        // $books->description = $request->description;
+        // $books->author = $request->author;
+        // $books->publisher = $request->publisher;
+        // $books->date_of_issue = $request->date_of_issue;
+        // if($books->save()){
+        //     return new BookResource($books);
+        // }
     }
 
     /**
@@ -185,16 +141,21 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete(Book $book, $id)
+    public function delete($id)
     {
-        try {
-            Book::destroy($id);
-            if ($book->book_image) {
-                Storage::delete($book->book_image);
-            }
-            return redirect('/')->with('statusDeleteSuccess', 'Buku berhasil dihapus !');
-        } catch (Exception $ex) {
-            return redirect('/')->with('statusDelete', 'Buku gagal dihapus / terjadi kesalahan !');
+        $book = Book::find($id);
+        if($book == null){
+            return [
+                'status' => '200 OK',
+                'message' => "Tidak ada data dengan id $id",    
+            ];   
+        } else {
+            $book->delete();
+            return response([
+                'data' => new BookResource($book), 
+                'message' => 'Delete successfully',
+                'status' => '200 OK'],
+                 200);
         }
     }
 }
