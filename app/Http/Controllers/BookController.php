@@ -18,7 +18,7 @@ class BookController extends Controller
     public function index()
     {
         $books = Book::get();
-    	return [
+        return [
             'status' => '200 OK',
             'message' => 'data terload',
             'data' => $books,
@@ -27,7 +27,7 @@ class BookController extends Controller
         // return BookResource::collection($books);
     }
 
- 
+
     /**
      * Store a newly created resource in storage.
      *
@@ -40,15 +40,17 @@ class BookController extends Controller
         $bookStore = new Book;
         $bookStore->title = $request->title;
         $bookStore->description = $request->description;
-        $bookStore->author = $request->author;
         $bookStore->publisher = $request->publisher;
         $bookStore->date_of_issue = $request->date_of_issue;
+        $bookStore->book_image = $request->book_image;
+        $bookStore->count_book = $request->count_book;
+        $bookStore->author_id = $request->author_id;
         $bookStore->save();
         return [
             'status' => '200 OK',
             'message' => 'Data berhasil ditambah',
             'data' => $bookStore,
-        ];  
+        ];
     }
 
     /**
@@ -60,32 +62,32 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Book::find($id);
-        if($book == null){
+        if ($book == null) {
             return [
                 'status' => '200 OK',
-                'message' => "Tidak ada data dengan id $id",    
-            ];   
+                'message' => "Tidak ada data dengan id $id",
+            ];
         } else {
-        return [
-            'status' => '200 OK',
-            'message' => 'Data terload',
-            'data' => $book,
-        ];   
+            return [
+                'status' => '200 OK',
+                'message' => 'Data terload',
+                'data' => $book,
+            ];
         }
     }
     public function search($title)
     {
-        $book = Book::where('title','LIKE',"%$title%")->get();
-        if(count($book) > 0){
+        $book = Book::where('title', 'LIKE', "%$title%")->get();
+        if (count($book) > 0) {
             return [
                 'status' => '200 OK',
                 'message' => 'Data successful loaded',
                 'data' => $book,
-            ];      
+            ];
         } else {
             return [
                 'status' => '404',
-                'message' => "Tidak ada data dengan title $title",    
+                'message' => "Tidak ada data dengan title $title",
             ];
         }
     }
@@ -111,18 +113,21 @@ class BookController extends Controller
     public function update(Request $request, $id)
     {
         $book = Book::find($id);
-        if($book == null){
+        if ($book == null) {
             return [
                 'status' => '200 OK',
-                'message' => "Tidak ada data dengan id $id",    
-            ];   
+                'message' => "Tidak ada data dengan id $id",
+            ];
         } else {
             $book->update($request->all());
-            return response([
-                'data' => new BookResource($book), 
-                'message' => 'Update successfully',
-                'status' => '200 OK'],
-                 200);
+            return response(
+                [
+                    'data' => new BookResource($book),
+                    'message' => 'Update successfully',
+                    'status' => '200 OK'
+                ],
+                200
+            );
         }
         // $books = Book::findOrFail($id);
         // $books->title = $request->title;
@@ -144,18 +149,21 @@ class BookController extends Controller
     public function delete($id)
     {
         $book = Book::find($id);
-        if($book == null){
+        if ($book == null) {
             return [
                 'status' => '200 OK',
-                'message' => "Tidak ada data dengan id $id",    
-            ];   
+                'message' => "Tidak ada data dengan id $id",
+            ];
         } else {
             $book->delete();
-            return response([
-                'data' => new BookResource($book), 
-                'message' => 'Delete successfully',
-                'status' => '200 OK'],
-                 200);
+            return response(
+                [
+                    'data' => new BookResource($book),
+                    'message' => 'Delete successfully',
+                    'status' => '200 OK'
+                ],
+                200
+            );
         }
     }
 }

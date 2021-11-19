@@ -47,8 +47,8 @@ class AuthorController extends Controller
             'date_of_birth' => $request->date_of_birth,
             'place_of_birth' => $request->place_of_birth,
             'gender' => $request->gender,
-            'email' => $request->email,
-            'hp' => $request->hp
+            'author_description' => $request->author_description,
+            'author_image' => $request->author_image
         ]);
         return response([
             'status' => 200,
