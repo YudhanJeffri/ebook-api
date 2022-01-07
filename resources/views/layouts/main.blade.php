@@ -27,13 +27,13 @@ $halaman;
                 <a class="nav-link {{ ($halaman === "book") ? 'active' : '' }}" aria-current="page" href="/">Daftar Buku</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link {{ ($halaman === "ayat") ? 'active' : '' }}" aria-current="page" href="/ayat">Daftar ayat</a>
+                <a class="nav-link {{ ($halaman === "pengarang") ? 'active' : '' }}" aria-current="page" href="/pengarang">Daftar Pengarang</a>
               </li>
               <li class="nav-item">
                 
                 @if ( Session::get('access_token') != null)
-                  @if ($halaman === 'ayat')
-                  <a class="nav-link active" href="/addayat" >Tambah ayat</a>
+                  @if ($halaman === 'pengarang')
+                  <a class="nav-link active" href="/addpengarang" >Tambah pengarang</a>
                   @elseif($halaman === 'book') 
                   <a class="nav-link active" href="/addBook" >Tambah Buku</a>    
                   @endif
@@ -45,12 +45,12 @@ $halaman;
             </ul>
             @if ($halaman === 'book')
             <form class="d-flex ms-auto" action="/">
-              <input class="form-control me-2" type="search" name="search" placeholder="pasal, ayat" aria-label="Search" value="{{ request('search') }}">
+              <input class="form-control me-2" type="search" name="search" placeholder="buku, pengarang" aria-label="Search" value="{{ request('search') }}">
               <button class="btn btn-outline-primary me-5" type="submit">Search</button>
             </form>
-            @elseif($halaman === 'ayat')
-            <form class="d-flex ms-auto" action="/ayat">
-              <input class="form-control me-2" type="search" name="search" placeholder="pasal, ayat" aria-label="Search" value="{{ request('search') }}">
+            @elseif($halaman === 'pengarang')
+            <form class="d-flex ms-auto" action="/pengarang">
+              <input class="form-control me-2" type="search" name="search" placeholder="buku, pengarang" aria-label="Search" value="{{ request('search') }}">
               <button class="btn btn-outline-primary me-5" type="submit">Search</button>
             </form>
             @endif
