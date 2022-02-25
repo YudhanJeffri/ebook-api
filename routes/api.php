@@ -2,10 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BookController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ApiBookController;
+use App\Http\Controllers\ApiAuthController;
 use App\Http\Controllers\AuthorController;
-use App\Http\Controllers\AuthControllerME;
+use App\Http\Controllers\ApiAuthControllerME;
 use App\Models\Authors;
 
 /*
@@ -25,9 +25,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     //  book
-    Route::POST('/books', [BookController::class, 'store']);
-    Route::PUT('/books/{id}', [BookController::class, 'update']);
-    Route::DELETE('/books/{id}', [BookController::class, 'delete']);
+    Route::POST('/books', [ApiBookController::class, 'store']);
+    Route::PUT('/books/{id}', [ApiBookController::class, 'update']);
+    Route::DELETE('/books/{id}', [ApiBookController::class, 'delete']);
     //  author
     Route::POST('/authors', [AuthorController::class, 'store']);
     Route::PUT('authors/{id}', [AuthorController::class, 'update']);
@@ -37,11 +37,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::GET('/authors', [AuthorController::class, 'index']);
 Route::GET('authors/{id}', [AuthorController::class, 'show']);
 
-Route::GET('/books', [BookController::class, 'index']);
-Route::GET('/books/search/{title}', [BookController::class, 'search']);
-Route::GET('/books/{id}', [BookController::class, 'show']);
+Route::GET('/books', [ApiBookController::class, 'index']);
+Route::GET('/books/search/{title}', [ApiBookController::class, 'search']);
+Route::GET('/books/{id}', [ApiBookController::class, 'show']);
 // auth
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
-Route::get('/user', [AuthController::class, 'index']);
+Route::post('/register', [ApiAuthController::class, 'register']);
+Route::post('/login', [ApiAuthController::class, 'login']);
+Route::post('/me', [ApiAuthController::class, 'me'])->middleware('auth:sanctum');
+Route::get('/user', [ApiAuthController::class, 'index']);
